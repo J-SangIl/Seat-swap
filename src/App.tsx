@@ -463,7 +463,7 @@ export default function App() {
 
                 <div 
                   className={cn(
-                    "grid gap-6 max-w-4xl mx-auto",
+                    "grid gap-3 max-w-4xl mx-auto",
                     layoutCols === 6 ? "grid-cols-3" : "grid-cols-5"
                   )}
                 >
@@ -476,13 +476,13 @@ export default function App() {
                             {[0, 1].map(colOffset => {
                               const seatIdx = rowIdx * 6 + sectionIdx * 2 + colOffset;
                               const seat = seats[seatIdx];
-                              if (!seat) return <div key={colOffset} className="aspect-square" />;
+                              if (!seat) return <div key={colOffset} className="aspect-[3/2]" />;
                               return (
                                 <button
                                   key={seatIdx}
                                   onClick={() => toggleFrontSeat(seatIdx)}
                                   className={cn(
-                                    "aspect-square rounded-lg border-2 transition-all flex items-center justify-center text-xs font-bold",
+                                    "aspect-[3/2] rounded-lg border-2 transition-all flex items-center justify-center text-xs font-bold",
                                     seat.isFrontSeat 
                                       ? "bg-[#E8F0FE] border-[#1A73E8] text-[#1A73E8] shadow-inner" 
                                       : "bg-white border-[#DADCE0] text-[#DADCE0] hover:border-[#1A73E8]"
@@ -503,7 +503,7 @@ export default function App() {
                         key={seat.index}
                         onClick={() => toggleFrontSeat(i)}
                         className={cn(
-                          "aspect-square rounded-xl border-2 transition-all flex items-center justify-center text-xs font-bold",
+                          "aspect-[3/2] rounded-xl border-2 transition-all flex items-center justify-center text-xs font-bold",
                           seat.isFrontSeat 
                             ? "bg-[#E8F0FE] border-[#1A73E8] text-[#1A73E8] shadow-inner" 
                             : "bg-white border-[#DADCE0] text-[#DADCE0] hover:border-[#1A73E8]"
@@ -579,6 +579,13 @@ export default function App() {
                     >
                       <Monitor className="w-4 h-4" />
                       교탁용 화면 (180도)
+                    </button>
+                    <button
+                      onClick={() => setStep('SELECT_FRONT_SEATS')}
+                      className="flex items-center gap-2 px-4 py-2 bg-white border border-[#DADCE0] text-[#5F6368] rounded-full text-sm font-bold hover:bg-gray-50"
+                    >
+                      <Grid3X3 className="w-4 h-4" />
+                      앞자리 다시 지정
                     </button>
                     <button
                       onClick={resetArrangement}
