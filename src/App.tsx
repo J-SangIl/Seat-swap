@@ -51,6 +51,7 @@ export default function App() {
   const [isShufflingFront, setIsShufflingFront] = useState(false);
   const [isShufflingOthers, setIsShufflingOthers] = useState(false);
   const [showPrintModal, setShowPrintModal] = useState(false);
+  const [selectedSeatIndex, setSelectedSeatIndex] = useState<number | null>(null);
 
   const currentClass = selectedClassIndex !== null ? allClasses[selectedClassIndex] : null;
 
@@ -176,6 +177,7 @@ export default function App() {
   // Randomize Front Group
   const randomizeFrontGroup = async () => {
     if (!currentClass || isShufflingFront) return;
+    setSelectedSeatIndex(null);
     const frontStudents = currentClass.students.filter(s => s.isFrontGroup);
     const frontSeatIndices = seats.filter(s => s.isFrontSeat).map(s => s.index);
     
@@ -199,6 +201,7 @@ export default function App() {
   // Randomize Others
   const randomizeOthers = async () => {
     if (!currentClass || isShufflingOthers) return;
+    setSelectedSeatIndex(null);
     const otherStudents = currentClass.students.filter(s => !s.isFrontGroup);
     const otherSeatIndices = seats.filter(s => !s.isFrontSeat).map(s => s.index);
     
@@ -224,6 +227,24 @@ export default function App() {
     setSeats(newSeats);
     setIsFrontGroupRandomized(false);
     setIsOthersRandomized(false);
+    setSelectedSeatIndex(null);
+  };
+
+  const handleSeatClick = (index: number) => {
+    if (selectedSeatIndex === null) {
+      setSelectedSeatIndex(index);
+    } else {
+      if (selectedSeatIndex !== index) {
+        setSeats(prev => {
+          const next = [...prev];
+          const temp = next[selectedSeatIndex].studentId;
+          next[selectedSeatIndex] = { ...next[selectedSeatIndex], studentId: next[index].studentId };
+          next[index] = { ...next[index], studentId: temp };
+          return next;
+        });
+      }
+      setSelectedSeatIndex(null);
+    }
   };
 
   return (
@@ -549,6 +570,9 @@ export default function App() {
                   </div>
                   
                   <div className="flex flex-wrap gap-2">
+                    <p className="w-full text-xs text-[#5F6368] mb-1 md:text-right italic">
+                      * 자리를 바꾸려면 두 좌석을 차례대로 클릭하세요.
+                    </p>
                     <button
                       onClick={randomizeFrontGroup}
                       className={cn(
@@ -627,15 +651,17 @@ export default function App() {
                               if (!seat) return <div key={colOffset} className="aspect-[4/3]" />;
                               const student = currentClass.students.find(s => s.id === seat.studentId);
                               return (
-                                <motion.div
+                                <motion.button
                                   key={seatIdx}
                                   layout
                                   initial={{ opacity: 0, scale: 0.8 }}
                                   animate={{ opacity: 1, scale: 1 }}
+                                  onClick={() => handleSeatClick(seatIdx)}
                                   className={cn(
-                                    "aspect-[4/3] rounded-xl border-2 flex flex-col items-center justify-center p-2 transition-all",
+                                    "aspect-[4/3] rounded-xl border-2 flex flex-col items-center justify-center p-2 transition-all cursor-pointer",
                                     seat.isFrontSeat ? "border-[#1A73E8]/30 bg-[#E8F0FE]/50" : "border-[#DADCE0] bg-white",
-                                    student ? "shadow-md" : "border-dashed opacity-40"
+                                    student ? "shadow-md" : "border-dashed opacity-40",
+                                    selectedSeatIndex === seatIdx && "ring-4 ring-[#1A73E8] border-[#1A73E8] z-10"
                                   )}
                                 >
                                   {student ? (
@@ -649,7 +675,7 @@ export default function App() {
                                   ) : (
                                     <span className="text-xs text-[#DADCE0] font-bold">{seatIdx + 1}</span>
                                   )}
-                                </motion.div>
+                                </motion.button>
                               );
                             })}
                           </React.Fragment>
@@ -661,15 +687,17 @@ export default function App() {
                     seats.map((seat, i) => {
                       const student = currentClass.students.find(s => s.id === seat.studentId);
                       return (
-                        <motion.div
+                        <motion.button
                           key={seat.index}
                           layout
                           initial={{ opacity: 0, scale: 0.8 }}
                           animate={{ opacity: 1, scale: 1 }}
+                          onClick={() => handleSeatClick(i)}
                           className={cn(
-                            "aspect-[4/3] rounded-xl border-2 flex flex-col items-center justify-center p-2 transition-all",
+                            "aspect-[4/3] rounded-xl border-2 flex flex-col items-center justify-center p-2 transition-all cursor-pointer",
                             seat.isFrontSeat ? "border-[#1A73E8]/30 bg-[#E8F0FE]/50" : "border-[#DADCE0] bg-white",
-                            student ? "shadow-md" : "border-dashed opacity-40"
+                            student ? "shadow-md" : "border-dashed opacity-40",
+                            selectedSeatIndex === i && "ring-4 ring-[#1A73E8] border-[#1A73E8] z-10"
                           )}
                         >
                           {student ? (
@@ -683,7 +711,7 @@ export default function App() {
                           ) : (
                             <span className="text-xs text-[#DADCE0] font-bold">{i + 1}</span>
                           )}
-                        </motion.div>
+                        </motion.button>
                       );
                     })
                   )}
