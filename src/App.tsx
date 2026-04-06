@@ -765,7 +765,7 @@ export default function App() {
                 initial={{ scale: 0.9, y: 20 }}
                 animate={{ scale: 1, y: 0 }}
                 exit={{ scale: 0.9, y: 20 }}
-                className="bg-white rounded-3xl shadow-2xl w-full max-w-[297mm] aspect-[1.414/1] overflow-hidden flex flex-col p-8 relative"
+                className="bg-white rounded-3xl shadow-2xl w-full max-w-[297mm] max-h-[95vh] aspect-[1.414/1] overflow-hidden flex flex-col p-8 relative"
                 onClick={(e) => e.stopPropagation()}
               >
                 <div className="flex justify-between items-center mb-6 no-print">
@@ -778,19 +778,30 @@ export default function App() {
                   </button>
                 </div>
 
-                <div className="flex-1 flex flex-col justify-between">
+                <div className="flex-1 flex flex-col min-h-0">
                   {/* Grid Area (Rotated 180) */}
                   <div 
                     className={cn(
-                      "grid gap-4 flex-1",
+                      "grid gap-2 flex-1 min-h-0",
                       layoutCols === 6 ? "grid-cols-3" : "grid-cols-5"
                     )}
+                    style={{
+                      gridTemplateRows: layoutCols === 5 
+                        ? `repeat(${Math.ceil(seats.length / 5)}, minmax(0, 1fr))` 
+                        : '1fr'
+                    }}
                   >
                     {/* We render the grid in reverse order for 180 rotation */}
                     {layoutCols === 6 ? (
                       // 6-column sectioned layout (Reversed Sections and Rows)
                       [2, 1, 0].map(sectionIdx => (
-                        <div key={sectionIdx} className="grid grid-cols-2 gap-2 p-2 bg-gray-50 rounded-xl border border-[#DADCE0]">
+                        <div 
+                          key={sectionIdx} 
+                          className="grid grid-cols-2 gap-2 p-2 bg-gray-50 rounded-xl border border-[#DADCE0] h-full"
+                          style={{
+                            gridTemplateRows: `repeat(${Math.ceil(seats.length / 6)}, minmax(0, 1fr))`
+                          }}
+                        >
                           {Array.from({ length: Math.ceil(seats.length / 6) }).reverse().map((_, revRowIdx) => {
                             const rowIdx = Math.ceil(seats.length / 6) - 1 - revRowIdx;
                             return (
@@ -798,20 +809,20 @@ export default function App() {
                                 {[1, 0].map(colOffset => {
                                   const seatIdx = rowIdx * 6 + sectionIdx * 2 + colOffset;
                                   const seat = seats[seatIdx];
-                                  if (!seat) return <div key={colOffset} className="aspect-[4/3]" />;
+                                  if (!seat) return <div key={colOffset} className="h-full" />;
                                   const student = currentClass.students.find(s => s.id === seat.studentId);
                                   return (
                                     <div
                                       key={seatIdx}
                                       className={cn(
-                                        "aspect-[4/3] rounded-lg border flex flex-col items-center justify-center p-1 bg-white",
+                                        "h-full rounded-lg border flex flex-col items-center justify-center p-1 bg-white",
                                         student ? "border-[#DADCE0]" : "border-dashed border-gray-200 opacity-30"
                                       )}
                                     >
                                       {student && (
                                         <>
-                                          <span className="text-base text-[#5F6368] font-bold mb-1">{student.id}번</span>
-                                          <span className="text-3xl font-bold text-[#202124]">{student.name}</span>
+                                          <span className="text-sm text-[#5F6368] font-bold mb-0.5">{student.id}번</span>
+                                          <span className="text-xl md:text-2xl lg:text-3xl font-bold text-[#202124] truncate w-full text-center px-1">{student.name}</span>
                                         </>
                                       )}
                                     </div>
@@ -830,14 +841,14 @@ export default function App() {
                           <div
                             key={seat.index}
                             className={cn(
-                              "aspect-[4/3] rounded-lg border flex flex-col items-center justify-center p-1 bg-white",
+                              "h-full rounded-lg border flex flex-col items-center justify-center p-1 bg-white",
                               student ? "border-[#DADCE0]" : "border-dashed border-gray-200 opacity-30"
                             )}
                           >
                             {student && (
                               <>
-                                <span className="text-base text-[#5F6368] font-bold mb-1">{student.id}번</span>
-                                <span className="text-3xl font-bold text-[#202124]">{student.name}</span>
+                                <span className="text-sm text-[#5F6368] font-bold mb-0.5">{student.id}번</span>
+                                <span className="text-xl md:text-2xl lg:text-3xl font-bold text-[#202124] truncate w-full text-center px-1">{student.name}</span>
                               </>
                             )}
                           </div>
@@ -847,7 +858,7 @@ export default function App() {
                   </div>
 
                   {/* Teacher's Area (Now at bottom) */}
-                  <div className="mt-8 relative flex justify-center items-start pt-8 border-t border-dashed border-[#DADCE0]">
+                  <div className="mt-4 relative flex justify-center items-start pt-4 border-t border-dashed border-[#DADCE0] shrink-0">
                     <div className="absolute right-0 top-8 border-2 border-[#DADCE0] p-2 rounded text-[10px] font-bold text-[#5F6368] uppercase">
                       앞문
                     </div>
